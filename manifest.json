@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "B站专注模式",
+  "version": "1.0.2",
+  "description": "屏蔽B站主页推荐，只留搜索框，帮你专注学习",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.bilibili.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.bilibili.com/",
+        "https://www.bilibili.com/?*",
+        "https://www.bilibili.com/index.html",
+        "https://www.bilibili.com/index.html?*"
+      ],
+      "js": [
+        "content_scripts/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

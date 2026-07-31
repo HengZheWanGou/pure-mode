@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B站专注模式</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <svg width="28" height="28" viewBox="0 0 72 30" fill="none">
+          <path d="M3.455 3.545C2.636 3.545 1.97 4.17 1.97 4.94V25.06C1.97 25.83 2.636 26.455 3.455 26.455H14.545V3.545H3.455Z" fill="#FB7299"/>
+          <path d="M18.455 3.545C17.636 3.545 16.97 4.17 16.97 4.94V25.06C16.97 25.83 17.636 26.455 18.455 26.455H29.545V3.545H18.455Z" fill="#23ADE5"/>
+          <text x="36" y="22" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#1A1A1E">bilibili</text>
+        </svg>
+      </div>
+      <h1 class="popup-title">B站专注模式</h1>
+      <p class="popup-version">v1.0.0</p>
+    </div>
+
+    <div class="popup-body">
+      <div class="toggle-section">
+        <div class="toggle-label">
+          <span class="toggle-label-text">专注模式</span>
+          <span class="toggle-status" id="status-text">已启用</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-btn" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="info-section">
+        <div class="info-item">
+          <span class="info-icon">🎯</span>
+          <span class="info-text">只在B站主页生效，不影响视频播放和搜索结果</span>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">🔒</span>
+          <span class="info-text">关闭此开关即可恢复B站原页面</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-footer">
+      <p>打开 bilibili.com 时自动生效</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
