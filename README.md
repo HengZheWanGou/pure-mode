@@ -2,6 +2,8 @@
 
 > 打开 B站主页，只保留搜索框。屏蔽所有推荐视频和板块，帮你专注学习。
 
+> A browser extension that strips Bilibili's homepage down to just a search box — no feeds, no distractions.
+
 ---
 
 ## 功能介绍
@@ -65,8 +67,11 @@
 ```
 bilibili-focus-mode/
 ├── manifest.json              # 扩展配置
-├── background.js              # Service Worker（状态管理）
+├── background.js              # Service Worker（状态管理 + 图标切换）
 ├── README.md                  # 本文件
+├── LICENSE                    # MIT 许可证
+├── tools/
+│   └── generate_icons.py      # 图标生成脚本
 ├── content_scripts/
 │   ├── content.js             # 核心：重建极简页面
 │   └── styles.css             # 备用兜底样式
@@ -75,9 +80,8 @@ bilibili-focus-mode/
 │   ├── popup.css              # 弹窗样式
 │   └── popup.js               # 弹窗交互
 └── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+    ├── icon16.png / icon48.png / icon128.png           # 彩色图标（启用状态）
+    └── icon16_gray.png / icon48_gray.png / icon128_gray.png  # 灰度图标（禁用状态）
 ```
 
 ## 实现原理
@@ -96,7 +100,7 @@ bilibili-focus-mode/
 
 ## 已知限制
 
-- 仅支持 `www.bilibili.com` 主页（`/` 和 `/index.html`），子域名或移动端暂不兼容
+- 仅支持 `www.bilibili.com` 与 `bilibili.com` 主页（`/` 和 `/index.html`），子域名或移动端暂不兼容
 - B站页面结构改版时可能需要更新选择器
 - 部分浏览器（如 Firefox）需要额外适配 Manifest V2/V3 差异
 
