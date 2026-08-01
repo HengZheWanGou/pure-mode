@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "B站专注模式",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "屏蔽B站主页推荐，只留搜索框，帮你专注学习",
   "permissions": [
     "storage",
@@ -9,7 +9,8 @@
   ],
   "host_permissions": [
     "https://www.bilibili.com/*",
-    "https://bilibili.com/*"
+    "https://bilibili.com/*",
+    "https://search.bilibili.com/*"
   ],
   "content_scripts": [
     {
@@ -27,6 +28,25 @@
         "content_scripts/content.js"
       ],
       "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://search.bilibili.com/*"
+      ],
+      "js": [
+        "content_scripts/search.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content_scripts/search.css"
+      ],
+      "matches": [
+        "https://search.bilibili.com/*"
+      ]
     }
   ],
   "action": {
