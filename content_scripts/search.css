@@ -1,182 +1,91 @@
-/* B站专注模式 — 搜索结果页净化样式
- * 由 search.js 注入，主题变量挂在 html[data-bfm-theme] 上
+/* B站专注模式 — 搜索结果页重构样式
+ * 自建页面 #bfm-search-root，主题变量挂在 html[data-bfm-theme] 上
  * 仅作用于 search.bilibili.com
  */
 
-/* ===== 1. 隐藏干扰元素 ===== */
+/* ===== 页面基底 ===== */
 
-/* 顶部频道导航（首页/番剧/直播/会员购…） */
-#bili-header-container,
-
-/* 课程/品牌横幅广告（结果区上方的大卡片） */
-.brand-ad-list,
-
-/* 页底游戏/活动推荐 */
-.activity-game-list-wrap,
-
-/* 页脚 */
-#biliMainFooter,
-.biliMainFooterWrapper,
-
-/* 广告反馈入口、侧边悬浮按钮、回到顶部 */
-.ad-feedback-entry,
-.side-buttons,
-.btn-to-top-wrap {
-  display: none !important;
-}
-
-/* ===== 2. 页面基底 ===== */
-
-html, body,
-.search-page-wrapper,
-.search-page,
-.search-content,
-.search-content--gray {
+html, body {
   background: var(--bfm-bg) !important;
 }
 
-/* ===== 3. 搜索栏（极简吸顶） ===== */
-
-.search-header {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 100 !important;
-  background: var(--bfm-bg) !important;
-  padding: 14px 0 10px !important;
-  border-bottom: 1px solid var(--bfm-border) !important;
+#bfm-search-root {
+  min-height: 100vh;
+  background: var(--bfm-bg);
+  color: var(--bfm-text);
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
-.search-input-container,
-.search-input-wrap {
-  background: var(--bfm-surface) !important;
-  border: 1px solid var(--bfm-border) !important;
-  border-radius: 999px !important;
-  transition: border-color .2s;
-}
+/* ===== 顶部栏（吸顶） ===== */
 
-.search-input-wrap:focus-within {
-  border-color: var(--bfm-focus-border) !important;
-}
-
-.search-input-el,
-.search-input {
-  background: transparent !important;
-  color: var(--bfm-text) !important;
-}
-
-.search-input-el::placeholder {
-  color: var(--bfm-text-secondary) !important;
-}
-
-/* 圆形搜索按钮改为文字按钮 */
-.search-button {
-  background: var(--bfm-focus-border) !important;
-  border-radius: 999px !important;
-  color: #fff !important;
-}
-
-/* ===== 4. 标签页与排序 ===== */
-
-.vui_tabs--nav-link,
-.vui_tabs--nav-text {
-  color: var(--bfm-text-secondary) !important;
-}
-
-.vui_tabs--nav-item-active .vui_tabs--nav-link,
-.vui_tabs--nav-link:hover {
-  color: var(--bfm-focus-border) !important;
-}
-
-.vui_tabs--nav-slider {
-  background: var(--bfm-focus-border) !important;
-}
-
-.vui_button--tab {
-  background: var(--bfm-btn-bg) !important;
-  color: var(--bfm-text-secondary) !important;
-  border: none !important;
-  border-radius: 999px !important;
-}
-
-.vui_button--tab.vui_button--active {
-  background: var(--bfm-focus-border) !important;
-  color: #fff !important;
-}
-
-/* ===== 5. 结果卡片 ===== */
-
-.bili-video-card {
-  border-radius: 12px !important;
-  overflow: hidden;
-  background: var(--bfm-surface) !important;
-  border: 1px solid var(--bfm-border) !important;
-  box-shadow: none !important;
-  transition: box-shadow .2s, transform .2s;
-}
-
-.bili-video-card:hover {
-  box-shadow: var(--bfm-shadow) !important;
-  transform: translateY(-2px);
-}
-
-.bili-video-card__image {
-  border-radius: 0 !important;
-}
-
-/* 封面遮罩去掉花哨渐变 */
-.bili-video-card__mask {
-  background: linear-gradient(transparent 60%, rgba(0,0,0,.55)) !important;
-}
-
-/* 标题 */
-.bili-video-card__info--tit a,
-.bili-video-card__info--tit {
-  color: var(--bfm-text) !important;
-}
-
-/* 关键词高亮保持 B站粉 */
-.bili-video-card__info--tit .keyword,
-.bili-video-card__info--tit em {
-  color: var(--bfm-focus-border) !important;
-}
-
-/* UP主 / 日期 / 播放量 */
-.bili-video-card__info--author,
-.bili-video-card__info--author-ico,
-.bili-video-card__info--date,
-.bili-video-card__stats,
-.bili-video-card__info--bottom {
-  color: var(--bfm-text-secondary) !important;
-}
-
-/* ===== 6. 分页「更多」按钮 ===== */
-
-.vui_button.i_button_more {
-  background: var(--bfm-surface) !important;
-  border: 1px solid var(--bfm-border) !important;
-  color: var(--bfm-text) !important;
-  border-radius: 999px !important;
-}
-
-/* ===== 7. 浮动主题切换按钮（由 JS 插入） ===== */
-
-.bfm-theme-fab {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 9999;
+#bfm-search-root .bfm-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 28px;
+  background: var(--bfm-bg);
+  border-bottom: 1px solid var(--bfm-border);
+}
+
+#bfm-search-root .bfm-logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--bfm-focus-border);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* 搜索框 */
+#bfm-search-root .bfm-search-box {
+  flex: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
   gap: 8px;
-  padding: 8px 10px;
+  padding: 9px 16px;
   background: var(--bfm-surface);
   border: 1px solid var(--bfm-border);
   border-radius: 999px;
-  box-shadow: var(--bfm-shadow);
+  transition: border-color .2s;
 }
 
-.bfm-theme-fab button {
-  width: 32px;
-  height: 32px;
+#bfm-search-root .bfm-search-box:focus-within {
+  border-color: var(--bfm-focus-border);
+}
+
+#bfm-search-root .bfm-search-icon {
+  color: var(--bfm-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#bfm-search-root .bfm-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--bfm-text);
+  font-size: 14px;
+}
+
+#bfm-search-root .bfm-search-input::placeholder {
+  color: var(--bfm-text-secondary);
+}
+
+/* 主题按钮 */
+#bfm-search-root .bfm-themes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+#bfm-search-root .bfm-themes button {
+  width: 34px;
+  height: 34px;
   border: none;
   border-radius: 50%;
   background: var(--bfm-btn-bg);
@@ -185,11 +94,138 @@ html, body,
   transition: background .2s, transform .2s;
 }
 
-.bfm-theme-fab button:hover {
+#bfm-search-root .bfm-themes button:hover {
   background: var(--bfm-btn-hover);
   transform: scale(1.1);
 }
 
-.bfm-theme-fab button.active {
+#bfm-search-root .bfm-themes button.active {
   outline: 2px solid var(--bfm-focus-border);
+}
+
+/* ===== 结果网格 ===== */
+
+#bfm-search-root .bfm-results {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 28px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+/* ===== 视频卡片 ===== */
+
+#bfm-search-root .bfm-card {
+  display: block;
+  background: var(--bfm-surface);
+  border: 1px solid var(--bfm-border);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: box-shadow .2s, transform .2s;
+}
+
+#bfm-search-root .bfm-card:hover {
+  box-shadow: var(--bfm-shadow);
+  transform: translateY(-2px);
+}
+
+/* 封面 */
+#bfm-search-root .bfm-cover {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--bfm-btn-bg);
+  overflow: hidden;
+}
+
+#bfm-search-root .bfm-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#bfm-search-root .bfm-duration {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 6px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, .6);
+  border-radius: 4px;
+}
+
+/* 信息区 */
+#bfm-search-root .bfm-info {
+  padding: 12px 14px 14px;
+}
+
+#bfm-search-root .bfm-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--bfm-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.9em;
+}
+
+#bfm-search-root .bfm-kw {
+  color: var(--bfm-focus-border);
+  font-style: normal;
+}
+
+#bfm-search-root .bfm-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--bfm-text-secondary);
+}
+
+#bfm-search-root .bfm-author {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--bfm-text-secondary);
+}
+
+/* ===== 空态与加载更多 ===== */
+
+#bfm-search-root .bfm-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--bfm-text-secondary);
+  font-size: 15px;
+}
+
+#bfm-search-root .bfm-loadmore-wrap {
+  text-align: center;
+  padding: 0 0 48px;
+}
+
+#bfm-search-root .bfm-loadmore {
+  padding: 10px 40px;
+  font-size: 14px;
+  color: var(--bfm-text);
+  background: var(--bfm-surface);
+  border: 1px solid var(--bfm-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+
+#bfm-search-root .bfm-loadmore:hover:not(:disabled) {
+  border-color: var(--bfm-focus-border);
+  color: var(--bfm-focus-border);
+}
+
+#bfm-search-root .bfm-loadmore:disabled {
+  cursor: default;
+  color: var(--bfm-text-secondary);
 }
