@@ -47,7 +47,7 @@
     const style = document.createElement('style');
     style.id = HIDE_STYLE_ID;
     style.textContent = `
-      .search-page-wrapper, #bili-header-container,
+      #app, .search-page-wrapper, #bili-header-container,
       #biliMainFooter, .biliMainFooterWrapper { display: none !important; }
       html, body { background: #F7F7F8; }
     `;
@@ -56,6 +56,26 @@
 
   function removeHideStyle() {
     document.getElementById(HIDE_STYLE_ID)?.remove();
+  }
+
+  // ===== 兜底：隐藏 body 下除插件页面外的所有元素 =====
+  // （B站客户端渲染结构不稳定，点名隐藏容器不可靠）
+  function hideNativeSiblings() {
+    [...document.body.children].forEach(el => {
+      if (el.id === ROOT_ID) return;
+      if (['SCRIPT', 'STYLE', 'LINK', 'TEMPLATE'].includes(el.tagName)) return;
+      if (el.style.display !== 'none') {
+        el.setAttribute('data-bfm-hidden', '1');
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  function restoreNativeSiblings() {
+    document.querySelectorAll('[data-bfm-hidden]').forEach(el => {
+      el.style.display = '';
+      el.removeAttribute('data-bfm-hidden');
+    });
   }
 
   // ===== 主入口 =====
@@ -131,6 +151,7 @@
       </div>
     `;
     document.body.appendChild(root);
+    hideNativeSiblings();
 
     // 搜索交互
     const input = root.querySelector('.bfm-search-input');
@@ -357,6 +378,7 @@
     document.getElementById(ROOT_ID)?.remove();
     document.getElementById(STYLE_ID)?.remove();
     removeHideStyle();
+    restoreNativeSiblings();
     document.documentElement.removeAttribute('data-bfm-theme');
     if (watchObserver) { watchObserver.disconnect(); watchObserver = null; }
   }
