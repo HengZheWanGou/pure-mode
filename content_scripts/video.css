@@ -54,62 +54,193 @@ bili-comments[data-bfm-collapsed="1"],
   border-color: var(--bfm-focus-border);
 }
 
-/* ===== 3. 页面主题 ===== */
+/* ===== 3. 页面主题（选择器已对真实 DOM 核实） ===== */
 
-html, body {
+/* --- 3.1 页面与容器底色 --- */
+
+html, body,
+#app,
+.video-container-v1,
+#mirror-vdcon {
   background: var(--bfm-bg) !important;
 }
 
-/* 标题与元信息 */
+/* 左栏各区块透明化，露出页面底色 */
+.left-container,
+.video-info-container,
+.video-toolbar-container,
+.video-desc-container,
+.video-tag-container,
+#commentapp {
+  background: transparent !important;
+}
+
+/* 右栏卡片式面板（UP主 / 弹幕列表 / 选集） */
+.up-info-container,
+.danmaku-box,
+.video-pod {
+  background: var(--bfm-surface) !important;
+  border: 1px solid var(--bfm-border) !important;
+  border-radius: 12px !important;
+}
+
+/* 播放器下方弹幕发送栏 */
+#bilibili-player-placeholder-bottom,
+.bpx-player-sending-area {
+  background: var(--bfm-surface) !important;
+}
+
+.bpx-player-video-info-online,
+.bpx-player-video-info-online-text,
+.bpx-player-dm-hint,
+.bpx-player-dm-btn {
+  color: var(--bfm-text-secondary) !important;
+}
+
+.bpx-player-dm-input,
+.bpx-player-dm-input input {
+  background: var(--bfm-bg) !important;
+  color: var(--bfm-text) !important;
+}
+
+.bpx-player-dm-btn-send {
+  background: var(--bfm-focus-border) !important;
+  color: #FFFFFF !important;
+}
+
+/* --- 3.2 标题与元信息 --- */
+
 .video-info-container .video-title,
-.video-info-title {
+.video-title {
   color: var(--bfm-text) !important;
 }
 
 .video-info-detail .view-text,
 .video-info-detail .dm-text,
 .video-info-detail .pubdate-ip-text,
-.video-info-detail .copyright-text {
+.video-info-detail .copyright-text,
+.video-info-detail-list .item {
   color: var(--bfm-text-secondary) !important;
 }
 
-/* UP主卡片 */
-.up-info-container,
-.up-detail {
+.video-info-detail-list svg,
+.video-info-meta svg {
+  fill: var(--bfm-text-secondary) !important;
+}
+
+/* --- 3.3 互动工具栏（点赞/投币/收藏/分享） --- */
+
+.video-toolbar-left-item,
+.video-toolbar-right-item,
+.video-toolbar-item-text {
+  color: var(--bfm-text-secondary) !important;
+}
+
+.video-toolbar-container svg {
+  fill: var(--bfm-text-secondary) !important;
+}
+
+/* --- 3.4 UP主卡片 --- */
+
+.up-name,
+.up-info--right .up-name {
   color: var(--bfm-text) !important;
 }
 
-.up-name,
-.up-info__right .up-name {
-  color: var(--bfm-text) !important;
+.up-name:hover {
+  color: var(--bfm-focus-border) !important;
 }
 
 .up-description,
-.up-info__right .up-description {
+.up-detail-bottom,
+.send-msg {
   color: var(--bfm-text-secondary) !important;
 }
 
-/* 简介与标签 */
-.desc-info,
-.desc-info-text,
-.basic-desc-info {
+/* --- 3.5 简介与标签 --- */
+
+.basic-desc-info,
+.desc-info-text {
   color: var(--bfm-text) !important;
+}
+
+.toggle-btn-text {
+  color: var(--bfm-focus-border) !important;
+}
+
+.tag-panel .tag,
+.ordinary-tag {
+  background: var(--bfm-surface) !important;
+  border-color: var(--bfm-border) !important;
 }
 
 .tag-link,
-.tag .tag-link {
+.ordinary-tag .tag-link,
+.show-more-btn {
   color: var(--bfm-text-secondary) !important;
 }
 
-/* 选集面板 */
-.video-pod__list,
-.multi-page-v1 .cur-list {
-  background: var(--bfm-surface) !important;
+/* --- 3.6 选集面板 --- */
+
+.video-pod__header .title,
+.video-pod__header .jumpable {
   color: var(--bfm-text) !important;
 }
 
-.video-pod__item,
-.multi-page-v1 .cur-list li {
+.video-pod__header .amt,
+.total-view,
+.video-pod__header .description {
+  color: var(--bfm-text-secondary) !important;
+}
+
+.subscribe-btn {
+  color: var(--bfm-focus-border) !important;
+  border-color: var(--bfm-focus-border) !important;
+  background: transparent !important;
+}
+
+.video-pod__item .title,
+.pod-item .title {
+  color: var(--bfm-text) !important;
+}
+
+.video-pod__item .stats,
+.pod-item .stats {
+  color: var(--bfm-text-secondary) !important;
+}
+
+.simple-base-item.active,
+.video-pod__item.active {
+  background: var(--bfm-btn-bg) !important;
+  border-radius: 8px;
+}
+
+/* --- 3.7 相关推荐卡片（展开时） --- */
+
+.video-page-card-small .info .title {
+  color: var(--bfm-text) !important;
+}
+
+.video-page-card-small .upname .name,
+.video-page-card-small .playinfo,
+.video-page-card-small .playinfo svg {
+  color: var(--bfm-text-secondary) !important;
+  fill: var(--bfm-text-secondary) !important;
+}
+
+.rec-footer {
+  color: var(--bfm-text-secondary) !important;
+}
+
+.rec-footer:hover {
+  color: var(--bfm-focus-border) !important;
+}
+
+/* --- 3.8 弹幕列表面板 --- */
+
+.bpx-player-collapse .bui-collapse-header,
+.danmaku-wrap .bui-collapse-header {
+  background: var(--bfm-surface) !important;
   color: var(--bfm-text) !important;
 }
 
