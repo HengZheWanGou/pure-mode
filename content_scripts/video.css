@@ -1,0 +1,200 @@
+/* B站专注模式 — 视频播放页净化样式
+ * 由 video.js 注入，主题变量挂在 html[data-bfm-theme] 上
+ * 仅作用于 www.bilibili.com/video/*
+ */
+
+/* ===== 1. 隐藏分心元素 ===== */
+
+/* 顶部频道导航 */
+#bili-header-container,
+
+/* 播放结束页内的推荐视频 */
+.bilibili-player-ending-panel-box-videos,
+.bpx-player-ending-related,
+
+/* 页脚 */
+#biliMainFooter,
+.biliMainFooterWrapper,
+
+/* 广告与运营位 */
+.ad-report,
+.ad-floor-exp,
+.activity-m-v1,
+.video-page-game-card,
+.pop-live-small-mode {
+  display: none !important;
+}
+
+/* ===== 2. 折叠区域（JS 控制 data-bfm-collapsed 属性） ===== */
+
+.recommend-list-v1[data-bfm-collapsed="1"],
+bili-comments[data-bfm-collapsed="1"],
+#comment[data-bfm-collapsed="1"] {
+  display: none !important;
+}
+
+/* 折叠开关按钮 */
+.bfm-collapse-toggle {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 10px 16px;
+  font-size: 13px;
+  text-align: left;
+  color: var(--bfm-text-secondary);
+  background: var(--bfm-surface);
+  border: 1px solid var(--bfm-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+
+.bfm-collapse-toggle:hover {
+  color: var(--bfm-focus-border);
+  border-color: var(--bfm-focus-border);
+}
+
+/* ===== 3. 页面主题 ===== */
+
+html, body {
+  background: var(--bfm-bg) !important;
+}
+
+/* 标题与元信息 */
+.video-info-container .video-title,
+.video-info-title {
+  color: var(--bfm-text) !important;
+}
+
+.video-info-detail .view-text,
+.video-info-detail .dm-text,
+.video-info-detail .pubdate-ip-text,
+.video-info-detail .copyright-text {
+  color: var(--bfm-text-secondary) !important;
+}
+
+/* UP主卡片 */
+.up-info-container,
+.up-detail {
+  color: var(--bfm-text) !important;
+}
+
+.up-name,
+.up-info__right .up-name {
+  color: var(--bfm-text) !important;
+}
+
+.up-description,
+.up-info__right .up-description {
+  color: var(--bfm-text-secondary) !important;
+}
+
+/* 简介与标签 */
+.desc-info,
+.desc-info-text,
+.basic-desc-info {
+  color: var(--bfm-text) !important;
+}
+
+.tag-link,
+.tag .tag-link {
+  color: var(--bfm-text-secondary) !important;
+}
+
+/* 选集面板 */
+.video-pod__list,
+.multi-page-v1 .cur-list {
+  background: var(--bfm-surface) !important;
+  color: var(--bfm-text) !important;
+}
+
+.video-pod__item,
+.multi-page-v1 .cur-list li {
+  color: var(--bfm-text) !important;
+}
+
+/* ===== 4. 插件顶栏（JS 插入） ===== */
+
+#bfm-video-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 28px;
+  background: var(--bfm-bg);
+  border-bottom: 1px solid var(--bfm-border);
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+#bfm-video-header .bfm-logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--bfm-focus-border);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+#bfm-video-header .bfm-search-box {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bfm-surface);
+  border: 1px solid var(--bfm-border);
+  border-radius: 999px;
+  transition: border-color .2s;
+}
+
+#bfm-video-header .bfm-search-box:focus-within {
+  border-color: var(--bfm-focus-border);
+}
+
+#bfm-video-header .bfm-search-icon {
+  color: var(--bfm-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#bfm-video-header .bfm-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--bfm-text);
+  font-size: 14px;
+}
+
+#bfm-video-header .bfm-search-input::placeholder {
+  color: var(--bfm-text-secondary);
+}
+
+#bfm-video-header .bfm-themes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+#bfm-video-header .bfm-themes button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bfm-btn-bg);
+  cursor: pointer;
+  font-size: 15px;
+  transition: background .2s, transform .2s;
+}
+
+#bfm-video-header .bfm-themes button:hover {
+  background: var(--bfm-btn-hover);
+  transform: scale(1.1);
+}
+
+#bfm-video-header .bfm-themes button.active {
+  outline: 2px solid var(--bfm-focus-border);
+}

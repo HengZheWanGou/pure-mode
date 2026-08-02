@@ -1,0 +1,298 @@
+// B站专注模式 — 视频播放页净化脚本
+// 方案：保留原生播放器，切除分心元素
+//   - 相关推荐 / 评论区：默认折叠，点击展开
+//   - 自动连播：强制关闭（点击播放器设置中的「播完暂停」）
+//   - 顶部导航 / 结束页推荐 / 广告位：隐藏
+// 仅作用于 www.bilibili.com/video/*
+
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'biliFocusMode';
+  const HIDE_STYLE_ID = 'bfm-video-hide-native';
+  const STYLE_ID = 'bfm-video-style';
+  const HEADER_ID = 'bfm-video-header';
+
+  const THEMES = {
+    light: {
+      bg: '#F7F7F8', surface: '#FFFFFF', border: '#E8E8E8',
+      text: '#1A1A1E', textSecondary: '#8C8C8C',
+      shadow: '0 4px 20px rgba(0,0,0,0.06)', focusBorder: '#FB7299',
+      btnBg: '#F0F0F1', btnHover: '#E6E6E8'
+    },
+    dark: {
+      bg: '#0D0D0D', surface: '#1A1A1E', border: '#2D2D33',
+      text: '#E8E8E8', textSecondary: '#888888',
+      shadow: '0 4px 20px rgba(0,0,0,0.3)', focusBorder: '#FB7299',
+      btnBg: '#2D2D33', btnHover: '#3D3D45'
+    },
+    paper: {
+      bg: '#F5F3EF', surface: '#FFFFFF', border: '#E0DCD5',
+      text: '#1A1A1E', textSecondary: '#8C8C8C',
+      shadow: '0 4px 20px rgba(0,0,0,0.04)', focusBorder: '#FB7299',
+      btnBg: '#E8E4DE', btnHover: '#DDD9D3'
+    }
+  };
+
+  let currentTheme = 'light';
+  let isActive = false;
+  let setupObserver = null;
+
+  // ===== 第 0 步：立即隐藏顶部导航（避免闪烁） =====
+  injectHideStyle();
+
+  function injectHideStyle() {
+    if (document.getElementById(HIDE_STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = HIDE_STYLE_ID;
+    style.textContent = `#bili-header-container { display: none !important; }`;
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  // ===== 主入口 =====
+  async function main() {
+    try {
+      const data = await getStorageData();
+      if (data.enabled === false) {
+        document.getElementById(HIDE_STYLE_ID)?.remove();
+        listenForEnable();
+        return;
+      }
+      isActive = true;
+      currentTheme = data.theme || 'light';
+      await injectStyles();
+      applyTheme(currentTheme);
+      whenReady(() => {
+        buildHeader();
+        setupCollapsibles();
+        disableAutoplay();
+      });
+      listenForDisable();
+      listenForThemeChange();
+    } catch (e) {
+      console.error('[B站专注模式] 视频页净化失败:', e);
+      document.getElementById(HIDE_STYLE_ID)?.remove(); // 失败兜底
+    }
+  }
+
+  function whenReady(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+
+  // ===== 注入净化样式 =====
+  async function injectStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const url = chrome.runtime.getURL('content_scripts/video.css');
+    const css = await (await fetch(url)).text();
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = css;
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  // ===== 插件顶栏（Logo + 搜索 + 主题） =====
+  function buildHeader() {
+    if (document.getElementById(HEADER_ID)) return;
+    const header = document.createElement('div');
+    header.id = HEADER_ID;
+    header.innerHTML = `
+      <a class="bfm-logo" href="https://www.bilibili.com/" title="回到B站主页">bilibili</a>
+      <div class="bfm-search-box">
+        <svg class="bfm-search-icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input class="bfm-search-input" type="text" autocomplete="off"
+               placeholder="搜索视频、UP主、番剧..."/>
+      </div>
+      <div class="bfm-themes">
+        <button data-theme="light" title="纯白">☀️</button>
+        <button data-theme="dark" title="深色">🌙</button>
+        <button data-theme="paper" title="纸张">📄</button>
+      </div>
+    `;
+    document.body.prepend(header);
+
+    const input = header.querySelector('.bfm-search-input');
+    const doSearch = () => {
+      const kw = input.value.trim();
+      if (kw) window.location.href =
+        `https://search.bilibili.com/all?keyword=${encodeURIComponent(kw)}`;
+    };
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+    header.querySelector('.bfm-search-icon').addEventListener('click', doSearch);
+
+    header.querySelectorAll('.bfm-themes button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        applyTheme(btn.dataset.theme);
+        await saveStorageData({ theme: btn.dataset.theme });
+      });
+    });
+    syncThemeButtons();
+  }
+
+  // ===== 折叠区域：相关推荐 + 评论区 =====
+  function setupCollapsibles() {
+    const trySetup = () => {
+      let allDone = true;
+
+      // 相关推荐（右栏）
+      const rec = document.querySelector('.recommend-list-v1');
+      if (rec) {
+        if (!rec.dataset.bfmInit) {
+          rec.dataset.bfmInit = '1';
+          rec.dataset.bfmCollapsed = '1';
+          rec.parentElement.insertBefore(makeToggle('相关推荐', rec), rec);
+        }
+      } else {
+        allDone = false;
+      }
+
+      // 评论区：新版 Shadow DOM 组件或旧版容器
+      const cm = document.querySelector('bili-comments') || document.getElementById('comment');
+      if (cm) {
+        if (!cm.dataset.bfmInit) {
+          cm.dataset.bfmInit = '1';
+          cm.dataset.bfmCollapsed = '1';
+          cm.parentElement.insertBefore(makeToggle('评论区', cm), cm);
+        }
+      } else {
+        allDone = false;
+      }
+
+      return allDone;
+    };
+
+    if (trySetup()) return;
+
+    // 元素异步渲染，监听直到出现（20 秒超时）
+    setupObserver = new MutationObserver(() => {
+      if (!isActive) return;
+      if (trySetup()) {
+        setupObserver.disconnect();
+        setupObserver = null;
+      }
+    });
+    setupObserver.observe(document.documentElement, { childList: true, subtree: true });
+    setTimeout(() => {
+      if (setupObserver) { setupObserver.disconnect(); setupObserver = null; }
+    }, 20000);
+  }
+
+  function makeToggle(label, target) {
+    const btn = document.createElement('button');
+    btn.className = 'bfm-collapse-toggle';
+    const render = (collapsed) => {
+      btn.textContent = collapsed
+        ? `▸ ${label}（已折叠，点击展开）`
+        : `▾ ${label}（点击折叠）`;
+    };
+    render(true);
+    btn.addEventListener('click', () => {
+      const collapsed = target.dataset.bfmCollapsed === '1';
+      target.dataset.bfmCollapsed = collapsed ? '0' : '1';
+      render(!collapsed);
+    });
+    return btn;
+  }
+
+  // ===== 关闭自动连播（点击播放器设置中的「播完暂停」） =====
+  function disableAutoplay() {
+    const tryClick = () => {
+      const radio = document.querySelector(
+        '.bpx-player-ctrl-setting-handoff input[type="radio"][value="2"]'
+      );
+      if (radio && !radio.checked) { radio.click(); return true; }
+      return !!radio;
+    };
+    if (tryClick()) return;
+    const obs = new MutationObserver(() => {
+      if (!isActive) return;
+      if (tryClick()) obs.disconnect();
+    });
+    obs.observe(document.documentElement, { childList: true, subtree: true });
+    setTimeout(() => obs.disconnect(), 20000);
+  }
+
+  // ===== 主题 =====
+  function applyTheme(name) {
+    const t = THEMES[name];
+    if (!t) return;
+    const root = document.documentElement;
+    root.style.setProperty('--bfm-bg', t.bg);
+    root.style.setProperty('--bfm-surface', t.surface);
+    root.style.setProperty('--bfm-border', t.border);
+    root.style.setProperty('--bfm-text', t.text);
+    root.style.setProperty('--bfm-text-secondary', t.textSecondary);
+    root.style.setProperty('--bfm-shadow', t.shadow);
+    root.style.setProperty('--bfm-focus-border', t.focusBorder);
+    root.style.setProperty('--bfm-btn-bg', t.btnBg);
+    root.style.setProperty('--bfm-btn-hover', t.btnHover);
+    root.setAttribute('data-bfm-theme', name);
+    currentTheme = name;
+    syncThemeButtons();
+  }
+
+  function syncThemeButtons() {
+    document.querySelectorAll(`#${HEADER_ID} .bfm-themes button`).forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+    });
+  }
+
+  // ===== 监听 =====
+  function listenForEnable() {
+    if (typeof chrome === 'undefined' || !chrome.storage) return;
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      const change = changes[STORAGE_KEY];
+      if (change?.newValue?.enabled === true && !isActive) location.reload();
+    });
+  }
+
+  function listenForDisable() {
+    if (typeof chrome === 'undefined' || !chrome.storage) return;
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      const change = changes[STORAGE_KEY];
+      if (change?.newValue?.enabled === false && isActive) location.reload();
+    });
+  }
+
+  function listenForThemeChange() {
+    if (typeof chrome === 'undefined' || !chrome.storage) return;
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      const newTheme = changes[STORAGE_KEY]?.newValue?.theme;
+      if (newTheme && newTheme !== currentTheme && isActive) applyTheme(newTheme);
+    });
+  }
+
+  // ===== Storage =====
+  function getStorageData() {
+    return new Promise((resolve) => {
+      if (typeof chrome !== 'undefined' && chrome.storage?.sync) {
+        chrome.storage.sync.get([STORAGE_KEY], (result) => {
+          resolve(result[STORAGE_KEY] || { enabled: true, theme: 'light' });
+        });
+      } else {
+        resolve({ enabled: true, theme: 'light' });
+      }
+    });
+  }
+
+  function saveStorageData(data) {
+    return new Promise((resolve) => {
+      if (typeof chrome === 'undefined' || !chrome.storage?.sync) return resolve();
+      chrome.storage.sync.get([STORAGE_KEY], (result) => {
+        const current = result[STORAGE_KEY] || { enabled: true, theme: 'light' };
+        chrome.storage.sync.set({ [STORAGE_KEY]: { ...current, ...data } }, resolve);
+      });
+    });
+  }
+
+  main();
+})();
