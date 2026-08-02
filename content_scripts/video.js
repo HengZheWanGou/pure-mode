@@ -45,7 +45,7 @@
     if (document.getElementById(HIDE_STYLE_ID)) return;
     const style = document.createElement('style');
     style.id = HIDE_STYLE_ID;
-    style.textContent = `#bili-header-container { display: none !important; }`;
+    style.textContent = `#biliMainHeader, #bili-header-container { display: none !important; }`;
     (document.head || document.documentElement).appendChild(style);
   }
 
