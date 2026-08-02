@@ -5,7 +5,8 @@
 
 /* ===== 1. 隐藏分心元素 ===== */
 
-/* 顶部频道导航 */
+/* 顶部频道导航（视频页为 #biliMainHeader） */
+#biliMainHeader,
 #bili-header-container,
 
 /* 播放结束页内的推荐视频 */
@@ -84,22 +85,24 @@ html, body,
   border-radius: 12px !important;
 }
 
-/* 播放器下方弹幕发送栏 */
+/* 播放器下方弹幕发送栏（白底来自 .bpx-player-sending-bar） */
 #bilibili-player-placeholder-bottom,
-.bpx-player-sending-area {
+.bpx-player-sending-area,
+.bpx-player-sending-bar {
   background: var(--bfm-surface) !important;
 }
 
 .bpx-player-video-info-online,
 .bpx-player-video-info-online-text,
 .bpx-player-dm-hint,
-.bpx-player-dm-btn {
+.bpx-player-dm-btn,
+.bpx-player-dm-wrap {
   color: var(--bfm-text-secondary) !important;
 }
 
 .bpx-player-dm-input,
 .bpx-player-dm-input input {
-  background: var(--bfm-bg) !important;
+  background: var(--bfm-btn-bg) !important;
   color: var(--bfm-text) !important;
 }
 
@@ -170,14 +173,26 @@ html, body,
 
 .tag-panel .tag,
 .ordinary-tag {
-  background: var(--bfm-surface) !important;
+  background: transparent !important;
   border-color: var(--bfm-border) !important;
 }
 
+/* 白色胶囊底在 <a class="tag-link"> 上 */
 .tag-link,
-.ordinary-tag .tag-link,
+.ordinary-tag .tag-link {
+  background: var(--bfm-btn-bg) !important;
+  color: var(--bfm-text-secondary) !important;
+}
+
+.tag-link:hover,
+.ordinary-tag .tag-link:hover {
+  background: var(--bfm-btn-hover) !important;
+  color: var(--bfm-focus-border) !important;
+}
+
 .show-more-btn {
   color: var(--bfm-text-secondary) !important;
+  background: var(--bfm-btn-bg) !important;
 }
 
 /* --- 3.6 选集面板 --- */
@@ -229,6 +244,7 @@ html, body,
 }
 
 .rec-footer {
+  background: var(--bfm-btn-bg) !important;
   color: var(--bfm-text-secondary) !important;
 }
 
@@ -240,6 +256,13 @@ html, body,
 
 .bpx-player-collapse .bui-collapse-header,
 .danmaku-wrap .bui-collapse-header {
+  background: var(--bfm-surface) !important;
+  color: var(--bfm-text) !important;
+}
+
+/* 展开后的列表主体也是白底 */
+.danmaku-box .bui-collapse-body,
+.danmaku-wrap .bui-collapse-body {
   background: var(--bfm-surface) !important;
   color: var(--bfm-text) !important;
 }
