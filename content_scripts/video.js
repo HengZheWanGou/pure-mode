@@ -62,7 +62,9 @@
       currentTheme = data.theme || 'light';
       await injectStyles();
       applyTheme(currentTheme);
-      whenReady(() => {
+      // 关键：等页面完全加载且浏览器空闲后再插入 DOM
+      // （过早插入会破坏 B站 Vue 水合/补丁，导致按钮失灵、头像不加载）
+      afterPageSettled(() => {
         buildHeader();
         setupCollapsibles();
         disableAutoplay();
@@ -75,12 +77,17 @@
     }
   }
 
-  function whenReady(fn) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn);
-    } else {
-      fn();
-    }
+  // 等页面完全加载且浏览器空闲，避免与 B站前端框架抢 DOM
+  function afterPageSettled(fn) {
+    const run = () => {
+      if (window.requestIdleCallback) {
+        requestIdleCallback(fn, { timeout: 2500 });
+      } else {
+        setTimeout(fn, 1500);
+      }
+    };
+    if (document.readyState === 'complete') run();
+    else window.addEventListener('load', run, { once: true });
   }
 
   // ===== 注入净化样式 =====
@@ -136,35 +143,35 @@
   }
 
   // ===== 折叠区域：相关推荐 + 评论区 =====
+  // 注意：绝不能往 #app（Vue 管辖）里插入节点，否则 Vue 补丁报错、页面事件失灵。
+  // 因此折叠只改目标元素的 data-bfm-collapsed 属性（安全），
+  // 开关按钮做成悬浮胶囊挂在 body 末尾（完全不碰 Vue 树）。
   function setupCollapsibles() {
-    const trySetup = () => {
-      let allDone = true;
+    let recDone = false;
+    let cmDone = false;
 
+    const trySetup = () => {
       // 相关推荐（右栏）
-      const rec = document.querySelector('.recommend-list-v1');
-      if (rec) {
-        if (!rec.dataset.bfmInit) {
-          rec.dataset.bfmInit = '1';
+      if (!recDone) {
+        const rec = document.querySelector('.recommend-list-v1');
+        if (rec) {
           rec.dataset.bfmCollapsed = '1';
-          rec.parentElement.insertBefore(makeToggle('相关推荐', rec), rec);
+          makeFloatToggle('相关推荐', rec, 0);
+          recDone = true;
         }
-      } else {
-        allDone = false;
       }
 
       // 评论区：新版 Shadow DOM 组件或旧版容器
-      const cm = document.querySelector('bili-comments') || document.getElementById('comment');
-      if (cm) {
-        if (!cm.dataset.bfmInit) {
-          cm.dataset.bfmInit = '1';
+      if (!cmDone) {
+        const cm = document.querySelector('bili-comments') || document.getElementById('comment');
+        if (cm) {
           cm.dataset.bfmCollapsed = '1';
-          cm.parentElement.insertBefore(makeToggle('评论区', cm), cm);
+          makeFloatToggle('评论区', cm, 1);
+          cmDone = true;
         }
-      } else {
-        allDone = false;
       }
 
-      return allDone;
+      return recDone && cmDone;
     };
 
     if (trySetup()) return;
@@ -183,21 +190,23 @@
     }, 20000);
   }
 
-  function makeToggle(label, target) {
+  // 悬浮折叠开关：append 到 body，fixed 定位在右下角
+  function makeFloatToggle(label, target, index) {
     const btn = document.createElement('button');
-    btn.className = 'bfm-collapse-toggle';
+    btn.className = 'bfm-collapse-toggle bfm-float-toggle';
+    btn.style.bottom = (170 + index * 48) + 'px';
     const render = (collapsed) => {
-      btn.textContent = collapsed
-        ? `▸ ${label}（已折叠，点击展开）`
-        : `▾ ${label}（点击折叠）`;
+      btn.textContent = collapsed ? `▸ ${label}` : `▾ ${label}`;
+      btn.title = collapsed ? `展开${label}` : `折叠${label}`;
     };
     render(true);
     btn.addEventListener('click', () => {
       const collapsed = target.dataset.bfmCollapsed === '1';
       target.dataset.bfmCollapsed = collapsed ? '0' : '1';
       render(!collapsed);
+      if (collapsed) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-    return btn;
+    document.body.appendChild(btn);
   }
 
   // ===== 关闭自动连播（点击播放器设置中的「播完暂停」） =====
