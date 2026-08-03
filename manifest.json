@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "B站专注模式",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "屏蔽B站主页推荐，只留搜索框，帮你专注学习",
   "permissions": [
     "storage",
