@@ -55,6 +55,19 @@ bili-comments[data-bfm-collapsed="1"],
   border-color: var(--bfm-focus-border);
 }
 
+/* 悬浮折叠开关（挂在 body，fixed 右下角，不进入 Vue 管辖的 #app） */
+.bfm-float-toggle {
+  position: fixed;
+  right: 12px;
+  z-index: 2000;
+  width: auto;
+  margin: 0;
+  padding: 9px 16px;
+  text-align: center;
+  border-radius: 999px;
+  box-shadow: var(--bfm-shadow);
+}
+
 /* ===== 3. 页面主题（选择器已对真实 DOM 核实） ===== */
 
 /* --- 3.1 页面与容器底色 --- */
