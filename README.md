@@ -37,18 +37,33 @@
 
 ## 安装方法
 
-### 方式一：Chrome 应用商店（推荐，暂未上架）
+### 方式一：Edge 加载项商店（推荐）
 
-等待上架后可直接安装。
+在 [Edge 加载项商店](https://microsoftedge.microsoft.com/addons) 搜索「适用于 bilibili 的专注模式」，点击「获取」即可，自动更新，Chrome 内核的浏览器（Edge / 360 / QQ 浏览器等）均可使用。
 
-### 方式二：开发者模式加载（当前可用）
+### 方式二：GitHub Release 下载安装（Chrome 用户推荐）
 
-1. 下载本仓库，解压到本地文件夹
-2. 打开 Chrome/Edge，地址栏输入 `chrome://extensions`（Edge 为 `edge://extensions`）
-3. 右上角打开「开发者模式」
-4. 点击「加载已解压的扩展程序」
-5. 选择 `bilibili-focus-mode` 文件夹
-6. 安装完成，打开 [bilibili.com](https://www.bilibili.com) 即可生效
+1. 打开本仓库的 [Releases 页面](../../releases)，下载最新版本的 `bilibili-focus-mode-vX.X.X.zip`
+2. 解压到一个**固定的文件夹**（注意：解压后这个文件夹不能删除或移动，删了扩展就没了）
+3. 打开 Chrome，地址栏输入 `chrome://extensions` 并回车
+4. 打开页面右上角的「**开发者模式**」开关
+5. 点击左上角「**加载已解压的扩展程序**」按钮
+6. 在弹窗中选择刚才解压出来的文件夹（里面能看到 `manifest.json` 的那一层），点击「选择文件夹」
+7. 安装完成！打开 [bilibili.com](https://www.bilibili.com) 即可生效
+8. 建议点击扩展图标旁边的 📌 把它固定到工具栏，方便随时开关
+
+> 💡 **常见问题**
+> - 看不到「加载已解压的扩展程序」按钮？→ 说明开发者模式没打开，看第 4 步
+> - 提示 "manifest 文件缺失"？→ 选错了文件夹层级，要选直接包含 `manifest.json` 的那层
+> - 想更新版本？→ 下载新 zip 解压**覆盖原文件夹**，然后在 `chrome://extensions` 里点扩展卡片上的 🔄 刷新按钮
+
+### 方式三：克隆源码加载（开发者）
+
+```bash
+git clone https://github.com/HengZheWanGou/pure-mode.git
+```
+
+然后按方式二的第 3–8 步，选择克隆下来的仓库文件夹即可。
 
 ## 使用说明
 
@@ -128,6 +143,7 @@ bilibili-focus-mode/
 
 ## 未来计划
 
+- [x] Edge 加载项商店上架（进行中）
 - [ ] Chrome Web Store 上架
 - [ ] Firefox 支持
 - [ ] 自定义背景图片
